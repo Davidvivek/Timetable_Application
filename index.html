@@ -78,7 +78,6 @@
             <p class="text-center text-gray-400 mb-6">Let's get you set up.</p>
             <div class="space-y-4">
                 <div>
-                    <!-- **MODIFIED**: Changed label and input for name/admission number -->
                     <label for="login-input" class="block text-sm font-medium text-gray-300">Full Name or Admission No.</label>
                     <input type="text" id="login-input" class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-white" placeholder="e.g., Alex Doe or 24je1234">
                 </div>
@@ -108,12 +107,10 @@
                 <h1 id="greeting" class="text-3xl md:text-4xl font-bold text-gray-100"></h1>
                 <p id="current-date" class="text-lg text-gray-400"></p>
             </div>
-            <!-- **MODIFIED**: Added a container for the buttons -->
             <div class="flex items-center space-x-2">
                 <button id="theme-toggle" class="p-2 rounded-full text-gray-400 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-gray-900">
                     <svg id="theme-icon-light" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                 </button>
-                <!-- **NEW**: Logout Button -->
                 <button id="logout-btn" class="p-2 rounded-full text-gray-400 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 focus:ring-offset-gray-900" title="Logout">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 </button>
@@ -179,8 +176,8 @@
 
     <script type="module">
         // Firebase Imports
-        // **MODIFIED**: Added signOut for logout functionality
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // **MODIFIED**: Added signOut for logout functionality
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -505,6 +502,17 @@
                 });
                 scheduleContainer.innerHTML = scheduleHTML || `<p class="text-center text-gray-400 p-4">No classes found for this subject.</p>`;
             });
+
+            // **NEW**: Logout button logic
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    // After successful sign out, reload the page to go back to the welcome modal
+                    window.location.reload();
+                } catch (error) {
+                    console.error("Error signing out:", error);
+                }
+            });
         }
 
         // --- APP START ---
@@ -519,10 +527,8 @@
                 }, 3000);
             });
 
-            // **MODIFIED**: Logic for the new login input
             document.getElementById('get-started-btn').addEventListener('click', async (e) => {
                 const button = e.currentTarget;
-                // **MODIFIED**: Changed element ID from 'name' to 'login-input'
                 const loginInputEl = document.getElementById('login-input');
                 const loginValue = loginInputEl.value.trim();
                 
