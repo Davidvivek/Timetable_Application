@@ -228,8 +228,8 @@
         };
 
         const driveIconSVG = `
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M7.71,3.5,1.84,13.25a1.43,1.43,0,0,0,0,1.5l5.87,9.75a1.43,1.43,0,0,0,1.24.75h11.7a1.43,1.43,0,0,0,1.24-.75l5.87-9.75a1.43,1.43,0,0,0,0-1.5L17.85,3.5a1.43,1.43,0,0,0-1.24-.75H8.95A1.43,1.43,0,0,0,7.71,3.5ZM10.2,6h8.53l-5.87,9.75-2.93-5L10.2,6Zm-1.47,1L5.8,12.5l2.93,5L11.67,11ZM17,18H11.4l2.94-5Z"/>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
             </svg>
         `;
 
@@ -288,6 +288,32 @@
                 localStorage.removeItem('timetableUserName');
                 location.reload();
             });
+
+            // Event delegation for subject links
+            document.getElementById('main-content').addEventListener('click', function(e) {
+                const target = e.target.closest('.subject-link');
+                if (target) {
+                    e.preventDefault();
+                    const subject = target.dataset.subject;
+
+                    // Hide other views
+                    document.getElementById('view-options').classList.add('hidden');
+                    document.getElementById('next-class-section').classList.add('hidden');
+                    document.getElementById('day-view').classList.add('hidden');
+                    
+                    // Show subject view
+                    const subjectView = document.getElementById('subject-view');
+                    subjectView.classList.remove('hidden');
+
+                    // Populate and set selector
+                    populateSubjectSelector();
+                    const subjectSelector = document.getElementById('subject-selector');
+                    subjectSelector.value = subject;
+                    
+                    // Display schedule
+                    displayScheduleForSubject(subject);
+                }
+            });
         }
 
         function updateGreeting(name) {
@@ -342,16 +368,21 @@
             if (nextClass) {
                 const labBadge = nextClass.isLab ? '<span class="bg-indigo-500 text-indigo-100 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">LAB</span>' : '';
                 const driveLinkHTML = (nextClass.driveLink && nextClass.driveLink !== '#') ?
-                    `<a href="${nextClass.driveLink}" target="_blank" rel="noopener noreferrer" class="group absolute top-4 right-4 p-2 rounded-full hover:bg-gray-600 transition-colors" title="Open in Drive">
+                    `<a href="${nextClass.driveLink}" target="_blank" rel="noopener noreferrer" class="group absolute bottom-4 right-4 p-2 rounded-full hover:bg-gray-600 transition-colors" title="Open in Drive">
                         <div class="text-gray-400 group-hover:text-indigo-300 transition-colors">${driveIconSVG}</div>
                      </a>` : '';
 
                 card.innerHTML = `
                     <div class="relative">
-                        <p class="text-gray-400 text-sm font-medium">${nextClass.day} at ${nextClass.startTime}</p>
-                        <h3 class="text-xl font-bold text-gray-100 mt-1">${nextClass.subject} ${labBadge}</h3>
-                        <p class="text-gray-300 mt-2">by ${nextClass.teacher}</p>
-                        <p class="text-gray-400">@ ${nextClass.location}</p>
+                        <div class="pr-12">
+                            <p class="text-gray-400 text-sm font-medium">${nextClass.day} at ${nextClass.startTime}</p>
+                            <h3 class="text-xl font-bold text-gray-100 mt-1">
+                                <a href="#" class="subject-link hover:underline" data-subject="${nextClass.subject}">${nextClass.subject}</a> 
+                                ${labBadge}
+                            </h3>
+                            <p class="text-gray-300 mt-2">by ${nextClass.teacher}</p>
+                            <p class="text-gray-400">@ ${nextClass.location}</p>
+                        </div>
                         ${driveLinkHTML}
                     </div>`;
             } else {
@@ -390,14 +421,17 @@
             classes.forEach(cls => {
                 const labBadge = cls.isLab ? '<span class="bg-indigo-500 text-indigo-100 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">LAB</span>' : '';
                 const driveLinkHTML = (cls.driveLink && cls.driveLink !== '#') ?
-                    `<a href="${cls.driveLink}" target="_blank" rel="noopener noreferrer" class="group p-2 rounded-full hover:bg-gray-600 transition-colors" title="Open in Drive">
+                    `<a href="${cls.driveLink}" target="_blank" rel="noopener noreferrer" class="group absolute bottom-4 right-4 p-2 rounded-full hover:bg-gray-600 transition-colors" title="Open in Drive">
                         <div class="text-gray-400 group-hover:text-indigo-300 transition-colors">${driveIconSVG}</div>
                      </a>` : '';
 
                 const cardHTML = `
-                    <div class="card p-4 bg-gray-800 border border-gray-700 flex items-center justify-between">
-                        <div>
-                            <p class="text-lg font-bold text-gray-100">${cls.subject} ${labBadge}</p>
+                    <div class="card p-4 bg-gray-800 border border-gray-700 relative">
+                        <div class="pr-12">
+                            <p class="text-lg font-bold text-gray-100">
+                                <a href="#" class="subject-link hover:underline" data-subject="${cls.subject}">${cls.subject}</a>
+                                ${labBadge}
+                            </p>
                             <p class="text-gray-400">${cls.startTime} - ${cls.endTime}</p>
                             <p class="text-gray-400">by ${cls.teacher} @ ${cls.location}</p>
                         </div>
@@ -439,19 +473,14 @@
 
             foundClasses.forEach(cls => {
                  const labBadge = cls.isLab ? '<span class="bg-indigo-500 text-indigo-100 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">LAB</span>' : '';
-                 const driveLinkHTML = (cls.driveLink && cls.driveLink !== '#') ?
-                    `<a href="${cls.driveLink}" target="_blank" rel="noopener noreferrer" class="group p-2 rounded-full hover:bg-gray-600 transition-colors" title="Open in Drive">
-                        <div class="text-gray-400 group-hover:text-indigo-300 transition-colors">${driveIconSVG}</div>
-                     </a>` : '';
-
+                
                 const cardHTML = `
-                    <div class="card p-4 bg-gray-800 border border-gray-700 flex items-center justify-between">
+                    <div class="card p-4 bg-gray-800 border border-gray-700">
                         <div>
-                            <p class="text-lg font-bold text-gray-100">${cls.day}</p>
+                            <p class="text-lg font-bold text-gray-100">${cls.day} ${labBadge}</p>
                             <p class="text-gray-400">${cls.startTime} - ${cls.endTime}</p>
                             <p class="text-gray-400">by ${cls.teacher} @ ${cls.location}</p>
                         </div>
-                        ${driveLinkHTML}
                     </div>
                 `;
                 scheduleContainer.innerHTML += cardHTML;
@@ -501,4 +530,3 @@
     </script>
 </body>
 </html>
-
