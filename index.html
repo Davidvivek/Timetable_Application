@@ -175,374 +175,286 @@
     </footer>
 
     <script type="module">
-        // Firebase Imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Firebase Imports (assuming you might use them later)
+        // import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATA ---
-        // **MODIFIED**: Added a 'driveLink' property to each class object.
-        // You can now add your unique hyperlinks here for each subject.
+        const driveLinks = {
+            COA: "https://drive.google.com/drive/folders/1EEzMZGGiSzHnWmpeW-mIqtqeBpNyhFv4?usp=sharing",
+            Maths: "https://drive.google.com/drive/folders/1gduXQrEoWLrFL9yeMgMpk8OIIAH4zGkW?usp=sharing",
+            Algo: "https://drive.google.com/drive/folders/1w9n3keD33yP492YnJtjFI-0cL5kfUS5Y?usp=sharing",
+            "C++": "https://drive.google.com/drive/folders/1woan3Dnb-4l51zTNk1LtIqmThvvN296u?usp=sharing",
+            ME: "https://drive.google.com/drive/folders/1g7UFWzi_8bDKWNv9sSNcQoUu1EB0padw?usp=sharing"
+        };
+
         const timetableData = {
             "Monday": [
-                { startTime: "09:00", endTime: "09:50", subject: "Computer Organisation and Architecture", shortName: "COA", teacher: "Jaishree M.", location: "G10", isLab: false, driveLink: "https://drive.google.com/drive/folders/1EEzMZGGiSzHnWmpeW-mIqtqeBpNyhFv4?usp=sharing" },
-                { startTime: "10:00", endTime: "10:50", subject: "Discrete Mathematics", shortName: "Maths", teacher: "Rahul G.", location: "G10", isLab: false, driveLink: "#" },
+                { startTime: "09:00", endTime: "09:50", subject: "Computer Organisation and Architecture", shortName: "COA", teacher: "Jaishree M.", location: "G10", isLab: false, driveLink: driveLinks.COA },
+                { startTime: "10:00", endTime: "10:50", subject: "Discrete Mathematics", shortName: "Maths", teacher: "Rahul G.", location: "G10", isLab: false, driveLink: driveLinks.Maths },
                 { startTime: "11:00", endTime: "11:50", subject: "COA / Algo", shortName: "COA/Algo", teacher: "Jaishree M. / P. P. Roy", location: "G10/G4", isLab: false, driveLink: "#" },
-                { startTime: "12:00", endTime: "12:50", subject: "Computer Programming with C++", shortName: "C++", teacher: "Subhrangsu M.", location: "G10", isLab: false, driveLink: "#" },
-                { startTime: "16:00", endTime: "17:50", subject: "Computer Organisation and Architecture Lab", shortName: "COA Lab", teacher: "Saurabh S., Tanusree K., Tarachand A.", location: "CSE Lab1", isLab: true, driveLink: "#" }
+                { startTime: "12:00", endTime: "12:50", subject: "Computer Programming with C++", shortName: "C++", teacher: "Subhrangsu M.", location: "G10", isLab: false, driveLink: driveLinks["C++"] },
+                { startTime: "16:00", endTime: "17:50", subject: "Computer Organisation and Architecture Lab", shortName: "COA Lab", teacher: "Saurabh S., Tanusree K., Tarachand A.", location: "CSE Lab1", isLab: true, driveLink: driveLinks.COA }
             ],
             "Tuesday": [
-                { startTime: "09:00", endTime: "09:50", subject: "Algorithm Design and Analysis", shortName: "Algo", teacher: "P.P. Roy", location: "G10", isLab: false, driveLink: "#" },
-                { startTime: "10:00", endTime: "10:50", subject: "Discrete Mathematics", shortName: "Maths", teacher: "Rahul G.", location: "G10", isLab: false, driveLink: "#" },
+                { startTime: "09:00", endTime: "09:50", subject: "Algorithm Design and Analysis", shortName: "Algo", teacher: "P.P. Roy", location: "G10", isLab: false, driveLink: driveLinks.Algo },
+                { startTime: "10:00", endTime: "10:50", subject: "Discrete Mathematics", shortName: "Maths", teacher: "Rahul G.", location: "G10", isLab: false, driveLink: driveLinks.Maths },
                 { startTime: "11:00", endTime: "11:50", subject: "Maths / COA", shortName: "Maths/COA", teacher: "Rahul G. / Jaishree M.", location: "G10/G4", isLab: false, driveLink: "#" },
-                { startTime: "12:00", endTime: "12:50", subject: "Computer Programming with C++", shortName: "C++", teacher: "Subhrangsu M.", location: "G10", isLab: false, driveLink: "#" },
-                { startTime: "16:00", endTime: "17:50", subject: "Computer Organisation and Architecture Lab", shortName: "COA Lab", teacher: "Saurabh S., Tanusree K., Tarachand A.", location: "CSE Lab1", isLab: true, driveLink: "#" }
+                { startTime: "12:00", endTime: "12:50", subject: "Computer Programming with C++", shortName: "C++", teacher: "Subhrangsu M.", location: "G10", isLab: false, driveLink: driveLinks["C++"] },
+                { startTime: "16:00", endTime: "17:50", subject: "Computer Organisation and Architecture Lab", shortName: "COA Lab", teacher: "Saurabh S., Tanusree K., Tarachand A.", location: "CSE Lab1", isLab: true, driveLink: driveLinks.COA }
             ],
             "Wednesday": [
-                { startTime: "09:00", endTime: "09:50", subject: "Microeconomics: Theory and Practice", shortName: "ME", teacher: "Mohd. I.", location: "G10", isLab: false, driveLink: "#" },
-                { startTime: "10:00", endTime: "10:50", subject: "Computer Organisation and Architecture", shortName: "COA", teacher: "Jaishree M.", location: "G10", isLab: false, driveLink: "#" },
+                { startTime: "09:00", endTime: "09:50", subject: "Microeconomics: Theory and Practice", shortName: "ME", teacher: "Mohd. I.", location: "G10", isLab: false, driveLink: driveLinks.ME },
+                { startTime: "10:00", endTime: "10:50", subject: "Computer Organisation and Architecture", shortName: "COA", teacher: "Jaishree M.", location: "G10", isLab: false, driveLink: driveLinks.COA },
                 { startTime: "11:00", endTime: "11:50", subject: "Algo / Maths", shortName: "Algo/Maths", teacher: "P. P. Roy / Rahul G.", location: "G10/G4", isLab: false, driveLink: "#" },
-                { startTime: "12:00", endTime: "12:50", subject: "Computer Programming with C++", shortName: "C++", teacher: "Subhrangsu M.", location: "G10", isLab: false, driveLink: "#" },
-                { startTime: "16:00", endTime: "17:50", subject: "Algorithm Design and Analysis Lab", shortName: "Algo Lab", teacher: "Ayan D., Soumen B.", location: "NLHC Lab1/3", isLab: true, driveLink: "#" }
+                { startTime: "12:00", endTime: "12:50", subject: "Computer Programming with C++", shortName: "C++", teacher: "Subhrangsu M.", location: "G10", isLab: false, driveLink: driveLinks["C++"] },
+                { startTime: "16:00", endTime: "17:50", subject: "Algorithm Design and Analysis Lab", shortName: "Algo Lab", teacher: "Ayan D., Soumen B.", location: "NLHC Lab1/3", isLab: true, driveLink: driveLinks.Algo }
             ],
             "Thursday": [
-                { startTime: "08:00", endTime: "08:50", subject: "Microeconomics: Theory and Practice", shortName: "ME", teacher: "Mohd. I.", location: "G10", isLab: false, driveLink: "#" },
-                { startTime: "09:00", endTime: "09:50", subject: "Computer Organisation and Architecture", shortName: "COA", teacher: "Jaishree M.", location: "G10", isLab: false, driveLink: "#" },
-                { startTime: "10:00", endTime: "10:50", subject: "Algorithm Design and Analysis", shortName: "Algo", teacher: "P.P. Roy", location: "G10", isLab: false, driveLink: "#" },
-                { startTime: "16:00", endTime: "17:50", subject: "Computer Organisation and Architecture Lab", shortName: "COA Lab", teacher: "Saurabh S., Tanusree K., Tarachand A.", location: "CSE Lab1", isLab: true, driveLink: "#" }
+                { startTime: "08:00", endTime: "08:50", subject: "Microeconomics: Theory and Practice", shortName: "ME", teacher: "Mohd. I.", location: "G10", isLab: false, driveLink: driveLinks.ME },
+                { startTime: "09:00", endTime: "09:50", subject: "Computer Organisation and Architecture", shortName: "COA", teacher: "Jaishree M.", location: "G10", isLab: false, driveLink: driveLinks.COA },
+                { startTime: "10:00", endTime: "10:50", subject: "Algorithm Design and Analysis", shortName: "Algo", teacher: "P.P. Roy", location: "G10", isLab: false, driveLink: driveLinks.Algo },
+                { startTime: "16:00", endTime: "17:50", subject: "Algorithm Design and Analysis Lab", shortName: "Algo Lab", teacher: "Ayan D., Soumen B.", location: "NLHC Lab1/3", isLab: true, driveLink: driveLinks.Algo }
             ],
             "Friday": [
-                { startTime: "08:00", endTime: "08:50", subject: "Microeconomics: Theory and Practice", shortName: "ME", teacher: "Mohd. I.", location: "G10", isLab: false, driveLink: "#" },
-                { startTime: "09:00", endTime: "09:50", subject: "Algorithm Design and Analysis", shortName: "Algo", teacher: "P.P. Roy", location: "G10", isLab: false, driveLink: "#" },
-                { startTime: "10:00", endTime: "10:50", subject: "Discrete Mathematics", shortName: "Maths", teacher: "Rahul G.", location: "G10", isLab: false, driveLink: "#" },
-                { startTime: "16:00", endTime: "17:50", subject: "Computer Organisation and Architecture Lab", shortName: "COA Lab", teacher: "Saurabh S., Tanusree K., Tarachand A.", location: "CSE Lab1", isLab: true, driveLink: "#" }
+                { startTime: "08:00", endTime: "08:50", subject: "Microeconomics: Theory and Practice", shortName: "ME", teacher: "Mohd. I.", location: "G10", isLab: false, driveLink: driveLinks.ME },
+                { startTime: "09:00", endTime: "09:50", subject: "Algorithm Design and Analysis", shortName: "Algo", teacher: "P.P. Roy", location: "G10", isLab: false, driveLink: driveLinks.Algo },
+                { startTime: "10:00", endTime: "10:50", subject: "Discrete Mathematics", shortName: "Maths", teacher: "Rahul G.", location: "G10", isLab: false, driveLink: driveLinks.Maths },
+                { startTime: "16:00", endTime: "17:50", subject: "Computer Programming with C++ Lab", shortName: "C++ Lab", teacher: "Subhrangsu M., Tanusree K.", location: "CSE Lab1", isLab: true, driveLink: driveLinks["C++"] }
             ],
             "Saturday": [],
             "Sunday": []
         };
-        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        
-        const holidayQuotes = [
-            "The time to relax is when you don't have time for it. Enjoy your weekend!",
-            "A Sunday well spent brings a week of content. Rest up!",
-            "Weekends are a bit like rainbows; they look good from a distance but disappear when you get up close to them. Enjoy it!",
-            "Take the time to do what makes your soul happy. Have a great holiday!",
-            "Rest and be thankful. A productive week is ahead."
-        ];
 
-        // --- FIREBASE SETUP ---
-        let auth, db, userId;
-        let logoutTimer;
-        const appId = 'my-timetable-app';
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyDztl5c7lnawjDgsgMChf_9yj9vabmdp78",
-            authDomain: "my-timetable-app-41d2d.firebaseapp.com",
-            projectId: "my-timetable-app-41d2d",
-            storageBucket: "my-timetable-app-41d2d.appspot.com",
-            messagingSenderId: "228848707949",
-            appId: "1:228848707949:web:1803f2fcc65cee97dfd264",
-            measurementId: "G-2BDDM20JL5"
-        };
+        const driveIconSVG = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.71,3.5,1.84,13.25a1.43,1.43,0,0,0,0,1.5l5.87,9.75a1.43,1.43,0,0,0,1.24.75h11.7a1.43,1.43,0,0,0,1.24-.75l5.87-9.75a1.43,1.43,0,0,0,0-1.5L17.85,3.5a1.43,1.43,0,0,0-1.24-.75H8.95A1.43,1.43,0,0,0,7.71,3.5ZM10.2,6h8.53l-5.87,9.75-2.93-5L10.2,6Zm-1.47,1L5.8,12.5l2.93,5L11.67,11ZM17,18H11.4l2.94-5Z"/>
+            </svg>
+        `;
 
-        function initializeFirebase() {
-            if (firebaseConfig && firebaseConfig.apiKey) {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                handleAuthentication();
-            } else {
-                console.error("Firebase config is not available or incomplete.");
-                document.getElementById('loading-spinner').classList.add('hidden');
-                document.getElementById('main-content').innerHTML = `<div class="text-center text-red-500 p-4">Could not connect to the database. Firebase configuration is missing.</div>`;
-                document.getElementById('main-content').classList.remove('hidden');
-            }
-        }
-        
-        async function handleAuthentication() {
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    userId = user.uid;
-                    await checkUserProfile();
-                } else {
-                    try {
-                        await signInAnonymously(auth);
-                    } catch (error) {
-                        console.error("Authentication failed:", error);
-                        document.getElementById('loading-spinner').classList.add('hidden');
-                    }
-                }
-            });
-        }
-
-        async function checkUserProfile() {
-            const userProfileRef = doc(db, 'artifacts', appId, 'users', userId);
-            try {
-                const docSnap = await getDoc(userProfileRef);
-                if (docSnap.exists()) {
-                    const userData = docSnap.data();
-                    logReturningUser(userId, userData.name);
-                    initializeAppUI(userData.name);
-                } else {
-                    document.getElementById('loading-spinner').classList.add('hidden');
-                    document.getElementById('welcome-modal').classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error("Error checking user profile:", error);
-                document.getElementById('loading-spinner').classList.add('hidden');
-                document.getElementById('welcome-modal').classList.remove('hidden');
-            }
-        }
-
-        async function saveUserData(name) {
-            if (!userId || !db) return;
-            const userProfileRef = doc(db, 'artifacts', appId, 'users', userId);
-            const visitorLogRef = doc(db, 'artifacts', appId, 'public', 'data', 'visitors', userId);
-            try {
-                await setDoc(userProfileRef, { name: name, createdAt: serverTimestamp() });
-                
-                const publicLogData = {
-                    name: name,
-                    userId: userId,
-                    loginCount: 1,
-                    firstLogin: serverTimestamp(),
-                    lastLogin: serverTimestamp()
-                };
-                await setDoc(visitorLogRef, publicLogData);
-
-            } catch (error) {
-                console.error("Error saving user data:", error);
-            }
-        }
-        
-        async function logReturningUser(uid) {
-            if (!uid || !db) return;
-            const visitorLogRef = doc(db, 'artifacts', appId, 'public', 'data', 'visitors', uid);
-            try {
-                await updateDoc(visitorLogRef, {
-                    lastLogin: serverTimestamp(),
-                    loginCount: increment(1)
-                });
-            } catch (error) {
-                console.error("Error updating user log:", error);
-            }
-        }
-
-        // --- UI INITIALIZATION ---
+        // --- UI FUNCTIONS ---
         function initializeAppUI(userName) {
-            document.getElementById('welcome-modal').classList.add('hidden');
             document.getElementById('loading-spinner').classList.add('hidden');
+            document.getElementById('welcome-modal').classList.add('hidden');
             document.getElementById('main-content').classList.remove('hidden');
-
-            document.getElementById('greeting').textContent = `Hello, ${userName}!`;
             
-            const now = new Date();
-            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
+            updateGreeting(userName);
+            updateDate();
             displayNextClass();
-            setupMainAppEventListeners();
-            populateViews();
+            setupUIListeners();
         }
 
-        // --- CORE LOGIC ---
-        function findNextClass() {
-            const now = new Date();
-            const currentDayIndex = now.getDay();
-            const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-
-            const today = daysOfWeek[currentDayIndex];
-            if (timetableData[today]) {
-                for (const cls of timetableData[today]) {
-                    if (cls.startTime > currentTime) {
-                        return { classInfo: cls, day: today };
-                    }
-                }
-            }
-
-            for (let i = 1; i <= 7; i++) {
-                const nextDayIndex = (currentDayIndex + i) % 7;
-                const nextDay = daysOfWeek[nextDayIndex];
-                if (timetableData[nextDay] && timetableData[nextDay].length > 0) {
-                    return { classInfo: timetableData[nextDay][0], day: nextDay };
-                }
-            }
-            
-            return null;
-        }
-
-        function displayNextClass() {
-            const card = document.getElementById('next-class-card');
-            const now = new Date();
-            const currentDayName = daysOfWeek[now.getDay()];
-
-            if (currentDayName === "Saturday" || currentDayName === "Sunday") {
-                const randomQuote = holidayQuotes[Math.floor(Math.random() * holidayQuotes.length)];
-                card.innerHTML = `
-                    <div class="text-center p-4">
-                        <h3 class="text-2xl font-bold text-gray-100">It's the Weekend!</h3>
-                        <p class="text-indigo-400 font-semibold mt-2">Time to recharge.</p>
-                        <p class="text-gray-400 mt-4 italic">"${randomQuote}"</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const nextClass = findNextClass();
-            if (nextClass) {
-                const { classInfo, day } = nextClass;
-                // **MODIFIED**: The href now uses the 'driveLink' property from the data object.
-                card.innerHTML = `
-                    <div class="flex flex-col md:flex-row md:items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-indigo-400">${day} at ${classInfo.startTime} - ${classInfo.endTime}</p>
-                            <div class="flex items-center space-x-3 mt-1">
-                                <h3 class="text-2xl font-bold text-gray-100">${classInfo.subject} (${classInfo.shortName})</h3>
-                                <a href="${classInfo.driveLink}" target="_blank" title="Open Drive Folder" class="drive-link">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500 hover:text-indigo-400 transition-colors duration-200" viewBox="0 0 20 20" fill="currentColor">
-                                      <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
-                                    </svg>
-                                </a>
-                            </div>
-                            <p class="text-gray-300 mt-2">${classInfo.teacher}</p>
-                        </div>
-                        <div class="mt-4 md:mt-0 md:text-right">
-                            <p class="text-lg font-semibold text-gray-100">${classInfo.location}</p>
-                            <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full mt-2 ${classInfo.isLab ? 'bg-red-900/50 text-red-300' : 'bg-green-900/50 text-green-300'}">
-                                ${classInfo.isLab ? 'Lab' : 'Theory'}
-                            </span>
-                        </div>
-                    </div>
-                `;
-            } else {
-                card.innerHTML = `<p class="text-xl font-semibold text-center text-gray-100">No upcoming classes. Enjoy your break!</p>`;
-            }
-        }
-
-        // **MODIFIED**: The href now uses the 'driveLink' property from the data object.
-        function createClassCard(classInfo, day) {
-            return `
-                <div class="card p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-800 border border-gray-700">
-                    <div>
-                        <div class="flex items-center space-x-3">
-                             <p class="font-bold text-lg text-gray-100">${classInfo.subject} (${classInfo.shortName})</p>
-                             <a href="${classInfo.driveLink}" target="_blank" title="Open Drive Folder" class="drive-link">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 hover:text-indigo-400 transition-colors duration-200" viewBox="0 0 20 20" fill="currentColor">
-                                  <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
-                                </svg>
-                            </a>
-                        </div>
-                        <p class="text-sm text-gray-400">${day ? day + ' | ' : ''}${classInfo.startTime} - ${classInfo.endTime}</p>
-                        <p class="text-sm text-gray-300 mt-1">${classInfo.teacher}</p>
-                    </div>
-                    <div class="mt-3 sm:mt-0 text-left sm:text-right">
-                        <p class="font-semibold text-gray-100">${classInfo.location}</p>
-                        <span class="inline-block px-2 py-0.5 text-xs font-semibold rounded-full mt-1 ${classInfo.isLab ? 'bg-red-900/50 text-red-300' : 'bg-green-900/50 text-green-300'}">
-                            ${classInfo.isLab ? 'Lab' : 'Theory'}
-                        </span>
-                    </div>
-                </div>
-            `;
-        }
-
-        function populateViews() {
-            const daySelector = document.getElementById('day-selector');
-            daySelector.innerHTML = '';
-            daysOfWeek.slice(1, 6).forEach(day => {
-                const button = document.createElement('button');
-                button.textContent = day;
-                button.className = 'btn px-4 py-2 rounded-md bg-gray-800 border-gray-600 hover:bg-gray-700';
-                button.dataset.day = day;
-                daySelector.appendChild(button);
-            });
-
-            const subjectSelector = document.getElementById('subject-selector');
-            subjectSelector.innerHTML = '';
-            const subjects = [...new Set(Object.values(timetableData).flat().map(c => c.subject))];
-            subjects.sort().forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject;
-                option.textContent = subject;
-                subjectSelector.appendChild(option);
-            });
-        }
-
-        function setupMainAppEventListeners() {
-            const mainSections = ['next-class-section', 'view-options'];
-            const dayView = document.getElementById('day-view');
-            const subjectView = document.getElementById('subject-view');
-
+        function setupUIListeners() {
+            // View switching
             document.getElementById('view-by-day-btn').addEventListener('click', () => {
-                mainSections.forEach(id => document.getElementById(id).classList.add('hidden'));
-                dayView.classList.remove('hidden');
+                document.getElementById('view-options').classList.add('hidden');
+                document.getElementById('next-class-section').classList.add('hidden');
+                document.getElementById('day-view').classList.remove('hidden');
+                populateDaySelector();
+                const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+                displayScheduleForDay(today);
+                document.querySelector(`button[data-day='${today}']`).classList.replace('bg-gray-700', 'bg-indigo-600');
             });
 
             document.getElementById('view-by-subject-btn').addEventListener('click', () => {
-                mainSections.forEach(id => document.getElementById(id).classList.add('hidden'));
-                subjectView.classList.remove('hidden');
+                document.getElementById('view-options').classList.add('hidden');
+                document.getElementById('next-class-section').classList.add('hidden');
+                document.getElementById('subject-view').classList.remove('hidden');
+                populateSubjectSelector();
+                displayScheduleForSubject(document.getElementById('subject-selector').value);
             });
 
-            function backToMain() {
-                dayView.classList.add('hidden');
-                subjectView.classList.add('hidden');
-                mainSections.forEach(id => document.getElementById(id).classList.remove('hidden'));
-            }
+            // Back buttons
+            document.getElementById('back-to-main-day').addEventListener('click', () => {
+                document.getElementById('day-view').classList.add('hidden');
+                document.getElementById('view-options').classList.remove('hidden');
+                document.getElementById('next-class-section').classList.remove('hidden');
+            });
 
-            document.getElementById('back-to-main-day').addEventListener('click', backToMain);
-            document.getElementById('back-to-main-subject').addEventListener('click', backToMain);
+            document.getElementById('back-to-main-subject').addEventListener('click', () => {
+                document.getElementById('subject-view').classList.add('hidden');
+                document.getElementById('view-options').classList.remove('hidden');
+                document.getElementById('next-class-section').classList.remove('hidden');
+            });
+
+            // Subject selector change
+            document.getElementById('subject-selector').addEventListener('change', (e) => {
+                displayScheduleForSubject(e.target.value);
+            });
+
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.removeItem('timetableUserName');
+                location.reload();
+            });
+        }
+
+        function updateGreeting(name) {
+            document.getElementById('greeting').textContent = `Hello, ${name}!`;
+        }
+
+        function updateDate() {
+            const now = new Date();
+            const dateString = now.toLocaleDateString('en-GB', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('current-date').textContent = dateString;
+        }
+
+        function findNextClass() {
+            const now = new Date();
+            const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
+            const currentTime = now.getHours() * 100 + now.getMinutes();
             
-            document.getElementById('day-selector').addEventListener('click', (e) => {
-                if(e.target.tagName === 'BUTTON') {
-                    const day = e.target.dataset.day;
-                    const scheduleContainer = document.getElementById('day-schedule');
-                    const classes = timetableData[day];
-                    
-                    document.querySelectorAll('#day-selector button').forEach(btn => btn.classList.remove('bg-indigo-500', 'text-white'));
-                    e.target.classList.add('bg-indigo-500', 'text-white');
+            let upcomingClasses = [];
 
-                    if (classes && classes.length > 0) {
-                        scheduleContainer.innerHTML = classes.map(cls => createClassCard(cls)).join('');
-                    } else {
-                        scheduleContainer.innerHTML = `<p class="text-center text-gray-400 p-4">No classes scheduled for ${day}.</p>`;
+            const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            let dayIndex = now.getDay();
+
+            for (let i = 0; i < 7; i++) {
+                const day = daysOfWeek[(dayIndex + i) % 7];
+                const classesForDay = timetableData[day] || [];
+                
+                for (const cls of classesForDay) {
+                    const [startHour, startMinute] = cls.startTime.split(':').map(Number);
+                    const classStartTime = startHour * 100 + startMinute;
+                    
+                    if (i === 0 && classStartTime > currentTime) {
+                        upcomingClasses.push({ ...cls, day: day });
+                    } else if (i > 0) {
+                        upcomingClasses.push({ ...cls, day: day });
                     }
                 }
-            });
+                if (upcomingClasses.length > 0) break;
+            }
+            
+            return upcomingClasses[0] || null;
+        }
 
-            document.getElementById('subject-selector').addEventListener('change', (e) => {
-                const subject = e.target.value;
-                const scheduleContainer = document.getElementById('subject-schedule');
-                let scheduleHTML = '';
-                daysOfWeek.slice(1,6).forEach(day => {
-                    timetableData[day].forEach(cls => {
-                        if (cls.subject === subject) {
-                            scheduleHTML += createClassCard(cls, day);
-                        }
-                    });
+        function displayNextClass() {
+            const nextClass = findNextClass();
+            const card = document.getElementById('next-class-card');
+            
+            if (nextClass) {
+                const labBadge = nextClass.isLab ? '<span class="bg-indigo-500 text-indigo-100 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">LAB</span>' : '';
+                const driveLinkHTML = (nextClass.driveLink && nextClass.driveLink !== '#') ?
+                    `<a href="${nextClass.driveLink}" target="_blank" rel="noopener noreferrer" class="group absolute top-4 right-4 p-2 rounded-full hover:bg-gray-600 transition-colors" title="Open in Drive">
+                        <div class="text-gray-400 group-hover:text-indigo-300 transition-colors">${driveIconSVG}</div>
+                     </a>` : '';
+
+                card.innerHTML = `
+                    <div class="relative">
+                        <p class="text-gray-400 text-sm font-medium">${nextClass.day} at ${nextClass.startTime}</p>
+                        <h3 class="text-xl font-bold text-gray-100 mt-1">${nextClass.subject} ${labBadge}</h3>
+                        <p class="text-gray-300 mt-2">by ${nextClass.teacher}</p>
+                        <p class="text-gray-400">@ ${nextClass.location}</p>
+                        ${driveLinkHTML}
+                    </div>`;
+            } else {
+                card.innerHTML = `<p class="text-gray-400">No upcoming classes. Enjoy your break!</p>`;
+            }
+        }
+
+        function populateDaySelector() {
+            const selector = document.getElementById('day-selector');
+            selector.innerHTML = '';
+            const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+            days.forEach(day => {
+                const button = document.createElement('button');
+                button.textContent = day;
+                button.dataset.day = day;
+                button.className = 'px-4 py-2 rounded-md text-sm font-medium bg-gray-700 hover:bg-gray-600 transition-colors';
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('#day-selector button').forEach(btn => btn.classList.replace('bg-indigo-600', 'bg-gray-700'));
+                    button.classList.replace('bg-gray-700', 'bg-indigo-600');
+                    displayScheduleForDay(day);
                 });
-                scheduleContainer.innerHTML = scheduleHTML || `<p class="text-center text-gray-400 p-4">No classes found for this subject.</p>`;
+                selector.appendChild(button);
+            });
+        }
+
+        function displayScheduleForDay(day) {
+            const scheduleContainer = document.getElementById('day-schedule');
+            scheduleContainer.innerHTML = '';
+            const classes = timetableData[day] || [];
+
+            if (classes.length === 0) {
+                scheduleContainer.innerHTML = `<div class="card bg-gray-800 p-4 text-center text-gray-400">No classes scheduled for ${day}.</div>`;
+                return;
+            }
+
+            classes.forEach(cls => {
+                const labBadge = cls.isLab ? '<span class="bg-indigo-500 text-indigo-100 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">LAB</span>' : '';
+                const driveLinkHTML = (cls.driveLink && cls.driveLink !== '#') ?
+                    `<a href="${cls.driveLink}" target="_blank" rel="noopener noreferrer" class="group p-2 rounded-full hover:bg-gray-600 transition-colors" title="Open in Drive">
+                        <div class="text-gray-400 group-hover:text-indigo-300 transition-colors">${driveIconSVG}</div>
+                     </a>` : '';
+
+                const cardHTML = `
+                    <div class="card p-4 bg-gray-800 border border-gray-700 flex items-center justify-between">
+                        <div>
+                            <p class="text-lg font-bold text-gray-100">${cls.subject} ${labBadge}</p>
+                            <p class="text-gray-400">${cls.startTime} - ${cls.endTime}</p>
+                            <p class="text-gray-400">by ${cls.teacher} @ ${cls.location}</p>
+                        </div>
+                        ${driveLinkHTML}
+                    </div>
+                `;
+                scheduleContainer.innerHTML += cardHTML;
+            });
+        }
+
+        function populateSubjectSelector() {
+            const selector = document.getElementById('subject-selector');
+            selector.innerHTML = '';
+            const subjects = [...new Set(Object.values(timetableData).flat().map(c => c.subject))].sort();
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                selector.appendChild(option);
+            });
+        }
+
+        function displayScheduleForSubject(subject) {
+            const scheduleContainer = document.getElementById('subject-schedule');
+            scheduleContainer.innerHTML = '';
+            let foundClasses = [];
+            Object.entries(timetableData).forEach(([day, classes]) => {
+                classes.forEach(cls => {
+                    if (cls.subject === subject) {
+                        foundClasses.push({ ...cls, day });
+                    }
+                });
             });
 
-            document.getElementById('logout-btn').addEventListener('click', async () => {
-                try {
-                    await signOut(auth);
-                    window.location.reload();
-                } catch (error) {
-                    console.error("Error signing out:", error);
-                }
-            });
+            if (foundClasses.length === 0) {
+                scheduleContainer.innerHTML = `<div class="card bg-gray-800 p-4 text-center text-gray-400">No schedule found for this subject.</div>`;
+                return;
+            }
 
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'hidden') {
-                    logoutTimer = setTimeout(async () => {
-                        try {
-                            await signOut(auth);
-                            window.location.reload();
-                        } catch (error) {
-                            console.error("Auto-logout failed:", error);
-                        }
-                    }, 3 * 60 * 1000); // 3 minutes
-                } else {
-                    clearTimeout(logoutTimer);
-                }
+            foundClasses.forEach(cls => {
+                 const labBadge = cls.isLab ? '<span class="bg-indigo-500 text-indigo-100 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">LAB</span>' : '';
+                 const driveLinkHTML = (cls.driveLink && cls.driveLink !== '#') ?
+                    `<a href="${cls.driveLink}" target="_blank" rel="noopener noreferrer" class="group p-2 rounded-full hover:bg-gray-600 transition-colors" title="Open in Drive">
+                        <div class="text-gray-400 group-hover:text-indigo-300 transition-colors">${driveIconSVG}</div>
+                     </a>` : '';
+
+                const cardHTML = `
+                    <div class="card p-4 bg-gray-800 border border-gray-700 flex items-center justify-between">
+                        <div>
+                            <p class="text-lg font-bold text-gray-100">${cls.day}</p>
+                            <p class="text-gray-400">${cls.startTime} - ${cls.endTime}</p>
+                            <p class="text-gray-400">by ${cls.teacher} @ ${cls.location}</p>
+                        </div>
+                        ${driveLinkHTML}
+                    </div>
+                `;
+                scheduleContainer.innerHTML += cardHTML;
             });
         }
 
@@ -558,7 +470,15 @@
                 }, 3000);
             });
 
-            document.getElementById('get-started-btn').addEventListener('click', async (e) => {
+            const savedUser = localStorage.getItem('timetableUserName');
+            if (savedUser) {
+                initializeAppUI(savedUser);
+            } else {
+                document.getElementById('loading-spinner').classList.add('hidden');
+                document.getElementById('welcome-modal').classList.remove('hidden');
+            }
+
+            document.getElementById('get-started-btn').addEventListener('click', (e) => {
                 const button = e.currentTarget;
                 const loginInputEl = document.getElementById('login-input');
                 const loginValue = loginInputEl.value.trim();
@@ -568,7 +488,7 @@
                 loginInputEl.classList.remove('border-red-500');
 
                 if (loginValue) {
-                    await saveUserData(loginValue);
+                    localStorage.setItem('timetableUserName', loginValue);
                     initializeAppUI(loginValue);
                 } else {
                     loginInputEl.classList.add('border-red-500');
@@ -576,10 +496,9 @@
                     button.textContent = 'Get Started';
                 }
             });
-
-            initializeFirebase();
         });
 
     </script>
 </body>
 </html>
+
